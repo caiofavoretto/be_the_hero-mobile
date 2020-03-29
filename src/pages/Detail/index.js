@@ -21,9 +21,16 @@ import {
   ActionText
 } from './styles';
 
-export default function Detail({ navigation }) {
-  const message =
-    'Olá APAD, estou entrando em contato pois gostaria de ajudar no caso "Cadelinha atropoelada" com o valor de R$120,00';
+export default function Detail({ navigation, route }) {
+  const { incident } = route.params;
+  const message = `Olá ${
+    incident.name
+  }, estou entrando em contato pois gostaria de ajudar no caso "${
+    incident.title
+  }" com o valor de ${Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(incident.value)}`;
 
   function navigateback() {
     navigation.goBack();
@@ -31,14 +38,16 @@ export default function Detail({ navigation }) {
 
   function sendMail() {
     MailComposer.composeAsync({
-      subject: 'Herói do caso: Cadelinha atropelada',
-      recipients: ['caiowfavoretto@gmail.com'],
+      subject: `Herói do caso: ${incident.title}`,
+      recipients: [incident.email],
       body: message
     });
   }
 
   function sendWhatsapp() {
-    Linking.openURL(`whatsapp://send?phone=5511984227739&text=${message}`);
+    Linking.openURL(
+      `whatsapp://send?phone=${incident.whatsapp}&text=${message}`
+    );
   }
 
   return (
@@ -53,13 +62,20 @@ export default function Detail({ navigation }) {
 
       <Incident>
         <IncidentProperty style={{ marginTop: 0 }}>ONG:</IncidentProperty>
-        <IncidentValue>APAD</IncidentValue>
+        <IncidentValue>
+          {incident.name} de {incident.city}/{incident.uf}
+        </IncidentValue>
 
         <IncidentProperty>CASO:</IncidentProperty>
-        <IncidentValue>Cadelinha atropelada</IncidentValue>
+        <IncidentValue>{incident.title}</IncidentValue>
 
         <IncidentProperty>Valor:</IncidentProperty>
-        <IncidentValue>R$ 120,00</IncidentValue>
+        <IncidentValue>
+          {Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          }).format(incident.value)}
+        </IncidentValue>
       </Incident>
 
       <ContactBox>
